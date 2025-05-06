@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include "regression.h"
 #include "data_loader.h"
 #include "utils.h"
@@ -10,6 +12,7 @@ int main() {
     int n_rows = 0;
     int n_cols = 0;
     const char* filename = "student_data.txt";
+    srand(time(NULL));
 
     int result = load_dataset(filename, data, &n_rows, &n_cols);
 
@@ -34,20 +37,22 @@ int main() {
     double y[n_rows];
 
     for (int h = 0; h < n_rows; h++) {
-        x[h] = data[h][2]; // total_units
-        y[h] = data[h][4]; // total_study_time
+        x[h] = data[h][11]; // quizzes_score_percentage
+        y[h] = data[h][14]; // final_exam_score
     }
 
 
     double slope = calculate_slope(x, y, n_rows);
     double intercept = calculate_intercept(x, y, n_rows, slope);
 
-    double new_data = 6;
-    double prediction = predict(new_data, slope, intercept);
+    double my_quizzes_score_percentage = rand() % (100 - 60 + 1) + 60;
+
+    double prediction = predict(my_quizzes_score_percentage, slope, intercept);
 
 
     printf("\nSlope: %.4f\n", slope);
     printf("Intercept: %.4f\n", intercept);
+    printf("My Quizzes score percentage: %.4f\n", my_quizzes_score_percentage);
     printf("Prediction: %.4f\n", prediction);
 
     return 0;

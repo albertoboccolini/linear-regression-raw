@@ -1,6 +1,6 @@
 # Linear Regression Raw
 
-This is a simple linear regression algorithm in C used to predict students `total_study_time` based on `total_units` trained on [student-engagement-and-performance dataset](https://huggingface.co/datasets/vunderkind/student-engagement-and-performance).
+This is a simple linear regression algorithm in C used to predict students `final_exam_score` based on `quizzes_score_percentage` trained on [student-engagement-and-performance dataset](https://huggingface.co/datasets/vunderkind/student-engagement-and-performance).
 
 ## Getting started
 
