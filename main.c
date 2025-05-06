@@ -7,53 +7,105 @@
 
 #define MAX_ROWS 1000
 
-int main() {
-    double data[MAX_ROWS][MAX_COLS];
-    int n_rows = 0;
-    int n_cols = 0;
-    const char* filename = "student_data.txt";
-    srand(time(NULL));
+double data[MAX_ROWS][MAX_COLS];
+int n_rows = 0, n_cols = 0;
+double slope = 0, intercept = 0;
+int dataset_loaded = 0;
 
+void load_dataset_cli() {
+    system("clear");
+    const char* filename = "student_data.txt";
     int result = load_dataset(filename, data, &n_rows, &n_cols);
 
     if (result != 0) {
-        printf("Errore nel caricamento del file: %s\n", filename);
-        return 1;
+        printf("Error loading file: %s\n", filename);
+        return;
     }
 
-    printf("Dataset caricato correttamente: %d righe, %d colonne\n", n_rows, n_cols);
+    printf("Dataset loaded: %d rows, %d columns\n", n_rows, n_cols);
+    dataset_loaded = 1;
+}
 
-    for (int i = 1; i < n_rows && i < 6; i++) {
-        printf("Riga %d:", i);
-        
-        for (int j = 0; j < n_cols; j++) {
-            printf(" %.2f", data[i][j]);
-        }
-
-        printf("\n");
+void regression_and_prediction() {
+    system("clear");
+    if (!dataset_loaded) {
+        printf("Please load the dataset first!\n");
+        return;
     }
 
     double x[n_rows];
     double y[n_rows];
-
-    for (int h = 0; h < n_rows; h++) {
-        x[h] = data[h][11]; // quizzes_score_percentage
-        y[h] = data[h][14]; // final_exam_score
+    for (int i = 0; i < n_rows; i++) {
+        x[i] = data[i][11]; // quizzes_score_percentage
+        y[i] = data[i][14]; // final_exam_score
     }
 
+    slope = calculate_slope(x, y, n_rows);
+    intercept = calculate_intercept(x, y, n_rows, slope);
+    double mse = calculate_mse(x, y, n_rows, slope, intercept);
 
-    double slope = calculate_slope(x, y, n_rows);
-    double intercept = calculate_intercept(x, y, n_rows, slope);
+    printf("Regression computed: slope = %.4f, intercept = %.4f\n", slope, intercept);
+    printf("Mean Squared Error (MSE): %.4f\n", mse);
 
-    double my_quizzes_score_percentage = rand() % (100 - 60 + 1) + 60;
+    double quiz_input;
+    printf("\nEnter student's quiz percentage (30-100): ");
+    scanf("%lf", &quiz_input);
 
-    double prediction = predict(my_quizzes_score_percentage, slope, intercept);
+    while (quiz_input < 30 || quiz_input > 100) {
+        printf("Invalid input. Please enter a value between 30 and 100: ");
+        scanf("%lf", &quiz_input);
+    }
 
+    double prediction = predict(quiz_input, slope, intercept);
+    printf("Predicted final exam score: %.2f\n", prediction);
+}
 
-    printf("\nSlope: %.4f\n", slope);
-    printf("Intercept: %.4f\n", intercept);
-    printf("My Quizzes score percentage: %.4f\n", my_quizzes_score_percentage);
-    printf("Prediction: %.4f\n", prediction);
+void exit_program() {
+    printf("\nExiting program.\n");
+    exit(0);
+}
 
+void menu() {
+    int gIndex;
+    int valid_input;
+    printf("\n----------------------------------------------\n");
+    printf("| Linear Regression Raw by Alberto Boccolini |\n");
+    printf("----------------------------------------------\n");
+
+    do {
+        freopen(NULL, "rb", stdin);
+        printf("\nSelection Menu\n");
+        printf("1 - Load dataset\n");
+        printf("2 - Compute regression and predict score\n");
+        printf("3 - Exit\n");
+        printf("\nEnter your choice: ");
+
+        valid_input = scanf("%i", &gIndex);
+
+        while (gIndex < 1 || gIndex > 3 || !valid_input) {
+            freopen(NULL, "rb", stdin);
+            printf("\nError: Invalid number.\n");
+            printf("Enter your choice: ");
+            valid_input = scanf("%i", &gIndex);
+        }
+
+        switch (gIndex) {
+            case 1:
+                load_dataset_cli();
+                break;
+            case 2:
+                regression_and_prediction();
+                break;
+            case 3:
+                exit_program();
+                break;
+        }
+
+    } while (1);
+}
+
+int main() {
+    srand(time(NULL));
+    menu();
     return 0;
 }
